@@ -65,7 +65,7 @@ echo "New GAV: ${NEW_GROUP_ID}:${NEW_ARTIFACT_ID}:${SPRING_WEB_VERSION}"
 echo "Output Directory: ${OUTPUT_DIR}"
 echo "=========================================="
 
-# 保存当前目录
+# 保存当前目录 (Save current directory)
 ORIGINAL_DIR=$(pwd)
 
 # 创建临时工作目录
