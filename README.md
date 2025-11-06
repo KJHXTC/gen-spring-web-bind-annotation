@@ -2,7 +2,50 @@
 
 生成 spring-web-bind-annotation 的工具脚本。
 
-## 快速开始
+## 从 GitHub Packages 使用（推荐）
+
+本仓库提供了自动构建的 Maven 包，发布在 GitHub Packages 上。当创建新的 tag 时，会自动构建并发布对应版本的包。
+
+### 配置 Maven
+
+在项目的 `pom.xml` 中添加仓库配置：
+
+```xml
+<repositories>
+    <repository>
+        <id>github</id>
+        <url>https://maven.pkg.github.com/KJHXTC/gen-spring-web-bind-annotation</url>
+    </repository>
+</repositories>
+```
+
+在 `~/.m2/settings.xml` 中配置 GitHub 认证（需要 GitHub Personal Access Token）：
+
+```xml
+<servers>
+    <server>
+        <id>github</id>
+        <username>YOUR_GITHUB_USERNAME</username>
+        <password>YOUR_GITHUB_TOKEN</password>
+    </server>
+</servers>
+```
+
+### 添加依赖
+
+在项目的 `pom.xml` 中添加：
+
+```xml
+<dependency>
+    <groupId>com.kjhxtc.springframework</groupId>
+    <artifactId>spring-web-bind-annotation</artifactId>
+    <version>5.3.31</version>
+</dependency>
+```
+
+版本号对应 Spring Web 的版本号。
+
+## 快速开始（本地构建）
 
 ```bash
 # 1. 克隆仓库（如果还没有）
@@ -156,6 +199,39 @@ mvn install:install-file \
 2. 确保有网络连接以便从 Maven 中央仓库下载依赖
 3. 首次运行可能需要较长时间，因为需要下载 Maven 插件
 4. 生成的 JAR 文件仅包含注解类，不包含 Spring Web 的其他功能
+
+## CI/CD 自动构建
+
+本仓库配置了 GitHub Actions，可以自动构建和发布包到 GitHub Packages。
+
+### 触发自动构建
+
+创建一个 git tag 即可触发自动构建和发布：
+
+```bash
+# 例如，发布 Spring Web 5.3.31 版本
+git tag 5.3.31
+git push origin 5.3.31
+
+# 或者使用 v 前缀
+git tag v6.1.13
+git push origin v6.1.13
+```
+
+### 构建过程
+
+当推送 tag 时，GitHub Actions 会自动：
+
+1. 提取 tag 名称作为版本号（自动去除 `v` 前缀）
+2. 运行 `gen-spring-web-bind-annotation.sh` 脚本生成 JAR 和 POM
+3. 使用固定的 `groupId: com.kjhxtc.springframework`
+4. 将构建的包部署到 GitHub Packages Maven 仓库
+5. 上传构建产物（保留 90 天）
+
+### 查看构建结果
+
+- 构建状态：在仓库的 Actions 标签页查看
+- Maven 包：在仓库的 Packages 标签页查看已发布的版本
 
 ## License
 
