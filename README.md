@@ -2,6 +2,32 @@
 
 生成 spring-web-bind-annotation 的工具脚本。
 
+## 快速开始
+
+```bash
+# 1. 克隆仓库（如果还没有）
+git clone https://github.com/KJHXTC/gen-spring-web-bind-annotation.git
+cd gen-spring-web-bind-annotation
+
+# 2. 给脚本添加执行权限
+chmod +x gen-spring-web-bind-annotation.sh
+
+# 3. 运行脚本生成 JAR 和 POM
+./gen-spring-web-bind-annotation.sh -v 5.3.31 -g com.mycompany.springframework
+
+# 4. 安装到本地 Maven 仓库
+mvn install:install-file \
+  -Dfile=./output/spring-web-bind-annotation-5.3.31.jar \
+  -DpomFile=./output/spring-web-bind-annotation-5.3.31.pom
+
+# 5. 在项目的 pom.xml 中使用
+# <dependency>
+#   <groupId>com.mycompany.springframework</groupId>
+#   <artifactId>spring-web-bind-annotation</artifactId>
+#   <version>5.3.31</version>
+# </dependency>
+```
+
 ## 功能说明
 
 该脚本从 Maven 中央仓库下载 `org.springframework:spring-web` 包，提取其中的 `org/springframework/web/bind/annotation` 包，删除其他所有类和包，然后重新打包生成一个精简版的 JAR 文件和对应的 POM 文件。
