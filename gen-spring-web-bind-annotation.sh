@@ -79,23 +79,39 @@ ORIGINAL_POM="${WORK_DIR}/${ORIGINAL_ARTIFACT_ID}-${SPRING_WEB_VERSION}.pom"
 
 # 使用 Maven 下载到本地仓库
 mvn dependency:get \
-    -DgroupId=${ORIGINAL_GROUP_ID} \
-    -DartifactId=${ORIGINAL_ARTIFACT_ID} \
-    -Dversion=${SPRING_WEB_VERSION} \
+    -DgroupId="${ORIGINAL_GROUP_ID}" \
+    -DartifactId="${ORIGINAL_ARTIFACT_ID}" \
+    -Dversion="${SPRING_WEB_VERSION}" \
     -Dpackaging=jar \
     -Dtransitive=false
 
 mvn dependency:get \
-    -DgroupId=${ORIGINAL_GROUP_ID} \
-    -DartifactId=${ORIGINAL_ARTIFACT_ID} \
-    -Dversion=${SPRING_WEB_VERSION} \
+    -DgroupId="${ORIGINAL_GROUP_ID}" \
+    -DartifactId="${ORIGINAL_ARTIFACT_ID}" \
+    -Dversion="${SPRING_WEB_VERSION}" \
     -Dpackaging=pom \
     -Dtransitive=false
 
-# 从本地 Maven 仓库复制文件
-LOCAL_REPO="${HOME}/.m2/repository"
+# 获取实际的本地 Maven 仓库路径
+LOCAL_REPO=$(mvn help:evaluate -Dexpression=settings.localRepository -q -DforceStdout 2>/dev/null)
+if [ -z "${LOCAL_REPO}" ] || [ ! -d "${LOCAL_REPO}" ]; then
+    # 回退到默认路径
+    LOCAL_REPO="${HOME}/.m2/repository"
+fi
+
 GROUP_PATH=$(echo ${ORIGINAL_GROUP_ID} | tr '.' '/')
 ARTIFACT_PATH="${LOCAL_REPO}/${GROUP_PATH}/${ORIGINAL_ARTIFACT_ID}/${SPRING_WEB_VERSION}"
+
+# 检查文件是否存在
+if [ ! -f "${ARTIFACT_PATH}/${ORIGINAL_ARTIFACT_ID}-${SPRING_WEB_VERSION}.jar" ]; then
+    echo "Error: Failed to download JAR file from Maven repository"
+    exit 1
+fi
+
+if [ ! -f "${ARTIFACT_PATH}/${ORIGINAL_ARTIFACT_ID}-${SPRING_WEB_VERSION}.pom" ]; then
+    echo "Error: Failed to download POM file from Maven repository"
+    exit 1
+fi
 
 cp "${ARTIFACT_PATH}/${ORIGINAL_ARTIFACT_ID}-${SPRING_WEB_VERSION}.jar" ${ORIGINAL_JAR}
 cp "${ARTIFACT_PATH}/${ORIGINAL_ARTIFACT_ID}-${SPRING_WEB_VERSION}.pom" ${ORIGINAL_POM}
@@ -154,9 +170,16 @@ echo ""
 echo "Step 5: Generating POM..."
 NEW_POM="${WORK_DIR}/${NEW_ARTIFACT_ID}-${SPRING_WEB_VERSION}.pom"
 
-# 从原始 POM 提取基本信息（使用 grep 和 sed，更通用）
-DESCRIPTION=$(grep -oP '(?<=<description>).*?(?=</description>)' ${ORIGINAL_POM} 2>/dev/null | head -1 || echo "Spring Web Bind Annotation - extracted from spring-web")
-URL=$(grep -oP '(?<=<url>).*?(?=</url>)' ${ORIGINAL_POM} 2>/dev/null | head -1 || echo "https://spring.io")
+# 从原始 POM 提取基本信息（使用 sed，更加通用和可移植）
+DESCRIPTION=$(sed -n 's/.*<description>\(.*\)<\/description>.*/\1/p' ${ORIGINAL_POM} 2>/dev/null | head -1)
+if [ -z "${DESCRIPTION}" ]; then
+    DESCRIPTION="Spring Web Bind Annotation - extracted from spring-web"
+fi
+
+URL=$(sed -n 's/.*<url>\(.*\)<\/url>.*/\1/p' ${ORIGINAL_POM} 2>/dev/null | head -1)
+if [ -z "${URL}" ]; then
+    URL="https://spring.io"
+fi
 
 cat > ${NEW_POM} << EOF
 <?xml version="1.0" encoding="UTF-8"?>
