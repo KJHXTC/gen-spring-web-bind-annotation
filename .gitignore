@@ -2,6 +2,7 @@
 output/
 test-output/
 dist/
+example-output/
 
 # Temporary files
 *.tmp
