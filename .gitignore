@@ -1,0 +1,21 @@
+# Output directories
+output/
+test-output/
+dist/
+example-output/
+
+# Temporary files
+*.tmp
+*.log
+
+# Maven local repository cache
+.m2/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
