@@ -40,6 +40,22 @@ jobs:
             -g com.kjhxtc.springframework \
             -o ./output
       
+      - name: Verify build output
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          if [ ! -f "./output/spring-web-bind-annotation-$VERSION.jar" ]; then
+            echo "Error: JAR file not found: ./output/spring-web-bind-annotation-$VERSION.jar"
+            ls -la ./output/ || echo "Output directory ./output/ does not exist or is empty"
+            exit 1
+          fi
+          if [ ! -f "./output/spring-web-bind-annotation-$VERSION.pom" ]; then
+            echo "Error: POM file not found: ./output/spring-web-bind-annotation-$VERSION.pom"
+            ls -la ./output/
+            exit 1
+          fi
+          echo "Build output verified successfully:"
+          ls -lh ./output/
+      
       - name: Set up Maven settings for GitHub Packages
         run: |
           mkdir -p ~/.m2

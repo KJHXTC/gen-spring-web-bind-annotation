@@ -65,6 +65,9 @@ echo "New GAV: ${NEW_GROUP_ID}:${NEW_ARTIFACT_ID}:${SPRING_WEB_VERSION}"
 echo "Output Directory: ${OUTPUT_DIR}"
 echo "=========================================="
 
+# 保存当前目录 (Save current directory)
+ORIGINAL_DIR=$(pwd)
+
 # 创建临时工作目录
 WORK_DIR=$(mktemp -d)
 trap "rm -rf ${WORK_DIR}" EXIT
@@ -207,6 +210,7 @@ echo "Created: ${NEW_POM}"
 # 创建输出目录并复制文件
 echo ""
 echo "Step 6: Copying to output directory..."
+cd "${ORIGINAL_DIR}"
 mkdir -p ${OUTPUT_DIR}
 cp ${NEW_JAR} ${OUTPUT_DIR}/
 cp ${NEW_POM} ${OUTPUT_DIR}/
